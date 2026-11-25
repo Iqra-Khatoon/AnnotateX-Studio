@@ -1,0 +1,1368 @@
+
+<!-- UPDATED ANNOTATEX STUDIO: IMPORT JSON FIXED -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AnnotateX Studio</title>
+
+<style>
+:root{
+  --bg:#111116;
+  --top:#191820;
+  --panel:#1d1b25;
+  --panel2:#24212e;
+  --canvas:#101015;
+  --border:#302c3a;
+  --purple:#a77be8;
+  --purple2:#8054c7;
+  --purple-soft:#302540;
+  --text:#f4f0fa;
+  --muted:#9992a8;
+  --green:#65c9a2;
+  --red:#e47d88;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;height:100vh;overflow:hidden;
+  font-family:Inter,"Segoe UI",Arial,sans-serif;
+  background:var(--bg);color:var(--text);
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.35;cursor:not-allowed}
+
+.topbar{
+  height:66px;background:var(--top);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:0 22px;gap:15px;flex-shrink:0;
+}
+.brand{display:flex;align-items:center;gap:12px;min-width:220px}
+.logo{
+  width:38px;height:38px;border-radius:12px;
+  display:grid;place-items:center;
+  background:linear-gradient(145deg,#bd99f1,#7950b9);
+  color:white;font-size:19px;font-weight:900;
+  box-shadow:0 4px 18px #9b70d533;
+}
+.brand-name{font-size:15px;font-weight:800;letter-spacing:.2px}
+.brand-sub{
+  color:#938b9f;font-size:9px;margin-top:3px;
+  letter-spacing:1.5px;text-transform:uppercase;
+}
+.project-area{
+  display:flex;align-items:center;gap:10px;
+  color:var(--muted);font-size:11px;
+}
+.project-name{
+  width:205px;background:transparent;
+  border:0;border-bottom:1px solid transparent;
+  padding:7px 3px;color:#eee8f7;
+  font-size:12px;font-weight:700;outline:none;
+}
+.project-name:focus{border-color:var(--purple)}
+.actions{display:flex;align-items:center;gap:8px}
+.btn{
+  border:1px solid #3a3544;background:#24212c;
+  color:#ddd6e8;padding:9px 13px;
+  border-radius:8px;font-size:11px;font-weight:700;
+  transition:.2s;
+}
+.btn:hover{background:#302a3b;border-color:#625075}
+.btn.primary{background:var(--purple2);border-color:var(--purple2);color:white}
+.btn.primary:hover{background:#9368d3}
+
+.app{
+  height:calc(100vh - 66px);min-height:0;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.main{
+  flex:1;min-height:0;
+  display:grid;
+  grid-template-columns:66px minmax(0,1fr) 292px;
+  grid-template-rows:minmax(0,1fr);
+  overflow:hidden;
+}
+.toolbar{
+  background:#191820;border-right:1px solid var(--border);
+  display:flex;align-items:center;flex-direction:column;
+  padding:17px 0;gap:9px;min-height:0;
+}
+.tool{
+  width:43px;height:43px;border:1px solid transparent;
+  border-radius:11px;background:transparent;
+  color:#aaa2b8;font-size:19px;display:grid;place-items:center;
+  transition:.18s;
+}
+.tool:hover{background:#292533;color:white}
+.tool.active{
+  background:var(--purple-soft);border-color:#55406f;
+  color:#c9a7fa;box-shadow:inset 3px 0 #ad84e8;
+}
+.tool-separator{width:30px;height:1px;background:#393442;margin:7px 0}
+.tool-caption{color:#756e80;font-size:8px;letter-spacing:.8px;text-transform:uppercase}
+
+.canvas-area{min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--canvas)}
+.canvas-header{
+  height:54px;flex-shrink:0;background:#1b1922;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 19px;
+}
+.file-info{display:flex;align-items:center;gap:10px;min-width:0}
+.file-indicator{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 9px #65c9a255}
+.file-title{font-size:11px;font-weight:750;max-width:260px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.dimensions{font-size:10px;color:#8e879b}
+.canvas-controls{display:flex;align-items:center;gap:7px}
+.canvas-stat{font-size:10px;color:#b4a9c2;margin-right:9px}
+.zoom-controls{
+  display:flex;align-items:center;gap:5px;
+  background:#24212d;border:1px solid #393443;border-radius:8px;padding:3px;
+}
+.zoom-controls button{width:26px;height:25px;border:0;border-radius:5px;background:transparent;color:#e1d8ed;font-size:15px}
+.zoom-controls button:hover{background:#3a3049}
+#zoomLabel{font-size:10px;color:#d8cde5;min-width:40px;text-align:center}
+.fit-button{background:#30283c;border:1px solid #55416b;border-radius:7px;padding:7px 11px;color:#d8bafa;font-size:10px;font-weight:700}
+
+.stage{
+  flex:1;min-height:0;overflow:auto;
+  display:flex;align-items:center;justify-content:center;
+  padding:35px;background-color:#111116;
+  background-image:radial-gradient(#ffffff0c 1px,transparent 1px);
+  background-size:20px 20px;
+}
+.canvas-wrap{position:relative;flex:none;background:#09090d;box-shadow:0 18px 55px #0009,0 0 0 1px #ffffff12;line-height:0}
+#canvas{display:block;max-width:none;max-height:none;touch-action:none}
+.empty-state{text-align:center;color:#aaa1b7;max-width:390px;line-height:1.6}
+.empty-icon{
+  width:76px;height:76px;border-radius:23px;margin:0 auto 20px;
+  display:grid;place-items:center;color:#c5a2f0;font-size:32px;
+  background:linear-gradient(145deg,#30243f,#211d2b);border:1px solid #59436f;
+}
+.empty-state h2{font-size:20px;color:#f4effa;margin:0 0 8px}
+.empty-state p{font-size:12px;color:#91899e;margin:0 0 22px;line-height:1.8}
+.empty-upload{background:var(--purple2);color:white;border:0;border-radius:9px;padding:11px 19px;font-size:11px;font-weight:750}
+.empty-upload:hover{background:#976dd6}
+
+.measurement{
+  position:absolute;z-index:5;top:12px;left:50%;
+  transform:translateX(-50%);background:#211b2c;
+  border:1px solid #72539a;color:#e8d9fa;
+  border-radius:7px;padding:7px 12px;font-size:10px;
+  font-weight:750;letter-spacing:.3px;box-shadow:0 5px 20px #0007;
+  pointer-events:none;white-space:nowrap;
+}
+.measurement[hidden]{display:none}
+
+.inspector{
+  background:#1b1922;border-left:1px solid var(--border);
+  min-height:0;height:100%;overflow-y:auto;overflow-x:hidden;
+  overscroll-behavior:contain;scrollbar-width:thin;
+  scrollbar-color:#66517e #1b1922;
+}
+.inspector::-webkit-scrollbar{width:8px}
+.inspector::-webkit-scrollbar-thumb{background:#66517e;border-radius:10px}
+.inspector::-webkit-scrollbar-thumb:hover{background:#9270b7}
+.inspector::-webkit-scrollbar-track{background:#1b1922}
+.inspector-heading{padding:19px 17px 16px;border-bottom:1px solid var(--border)}
+.inspector-heading-row{display:flex;align-items:center;justify-content:space-between}
+.inspector-heading strong{font-size:10px;letter-spacing:1.1px;color:#e7dfef}
+.inspector-heading p{font-size:10px;color:#898194;margin:7px 0 0}
+.section{padding:16px;border-bottom:1px solid #302c38}
+.section-title{
+  font-size:9px;font-weight:800;color:#a99fb5;
+  letter-spacing:1px;text-transform:uppercase;margin-bottom:13px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.count{background:#30283c;color:#c7a8ed;padding:4px 8px;border-radius:20px;font-size:9px}
+.object-list{display:flex;flex-direction:column;gap:7px}
+.object-item{
+  padding:10px;border-radius:8px;background:#24212c;
+  border:1px solid #302c38;display:flex;align-items:center;
+  gap:9px;cursor:pointer;transition:.15s;
+}
+.object-item:hover{border-color:#66517e;background:#2b2635}
+.object-item.selected{background:#302540;border-color:#8e68ba}
+.object-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+.object-name{font-size:10px;font-weight:700;flex:1;color:#e8e0ef}
+.object-size{font-size:9px;color:#9990a5}
+.empty-list{text-align:center;padding:18px 8px;color:#82798e;font-size:10px;line-height:1.7;border:1px dashed #46404e;border-radius:8px}
+.field-label{display:block;font-size:9px;font-weight:700;color:#9d94a9;margin:11px 0 6px}
+select,input[type=text],input[type=number]{
+  width:100%;padding:9px 10px;border:1px solid #3c3646;
+  border-radius:7px;font-size:10px;outline:none;background:#25222d;color:#eee7f5;
+}
+select:focus,input:focus{border-color:#9d77cf;box-shadow:0 0 0 3px #a77be81c}
+select option{background:#25222d;color:white}
+.label-row{display:flex;gap:7px}
+.label-row input{min-width:0;flex:1}
+.label-row button{border:1px solid #6a4d8c;background:#302540;color:#d8b9fa;border-radius:7px;padding:0 12px;font-size:10px;font-weight:750}
+.label-row button:hover{background:#46335d}
+.coord-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.coord-grid input{padding:9px}
+.hint{font-size:9px;color:#837b8e;line-height:1.6;margin-top:11px}
+.delete-button{width:100%;padding:10px;border:1px solid #71434b;color:#e99aa2;background:#352329;border-radius:8px;font-size:10px;font-weight:750}
+.delete-button:hover{background:#492b32}
+.delete-button:disabled{opacity:.35}
+
+.filmstrip{height:126px;flex-shrink:0;background:#1b1922;border-top:1px solid var(--border);display:flex;flex-direction:column}
+.filmstrip-header{height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 17px;border-bottom:1px solid #302c38}
+.filmstrip-header strong{font-size:9px;color:#b5aabd;letter-spacing:1px}
+.filmstrip-header span{font-size:9px;color:#898194}
+.thumbnails{display:flex;align-items:center;gap:10px;padding:8px 15px;overflow-x:auto;flex:1}
+.thumb{width:116px;height:70px;min-width:116px;border:1px solid #393442;border-radius:8px;overflow:hidden;position:relative;background:#25222d;padding:0;transition:.15s}
+.thumb:hover{border-color:#8b6bb0}
+.thumb.active{border:2px solid #a77be8;box-shadow:0 0 0 2px #a77be822}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb-name{position:absolute;bottom:0;left:0;right:0;background:#111116e8;color:#eee8f4;font-size:9px;padding:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.add-thumb{width:116px;height:70px;min-width:116px;border:1px dashed #62546f;border-radius:8px;background:#24212d;color:#c2a2e5;font-size:19px}
+.add-thumb:hover{background:#302540;border-color:#a77be8}
+.add-thumb span{display:block;font-size:9px;font-weight:700;margin-top:4px}
+
+.statusbar{height:27px;background:#15141b;border-top:1px solid #302c38;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:9px;color:#898194;flex-shrink:0}
+.status-left{display:flex;align-items:center;gap:8px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#65c9a2}
+#fileInput,#jsonInput,#relinkInput{display:none}
+
+.save-overlay{
+  position:fixed;inset:0;z-index:1000;background:#000a;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.save-overlay[hidden]{display:none}
+.save-dialog{
+  width:100%;max-width:390px;background:#211e2a;
+  border:1px solid #55436b;border-radius:15px;padding:24px;
+  box-shadow:0 20px 70px #000b;
+}
+.save-dialog h2{margin:0 0 8px;color:#f4effa;font-size:17px}
+.save-dialog p{margin:0 0 19px;color:#a49bad;font-size:11px;line-height:1.6}
+.save-dialog label{display:block;color:#c5b7d5;font-size:10px;font-weight:700;margin-bottom:8px}
+.save-dialog input{width:100%;padding:12px;border:1px solid #51445f;border-radius:8px;outline:none;background:#17151e;color:white;font-size:12px}
+.save-dialog input:focus{border-color:#a77be8;box-shadow:0 0 0 3px #a77be822}
+.save-dialog-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.save-cancel{border:1px solid #514858;background:#302b38;color:#ddd5e8;padding:10px 17px;border-radius:8px;font-size:11px;font-weight:700}
+.save-confirm{border:1px solid var(--purple2);background:var(--purple2);color:white;padding:10px 19px;border-radius:8px;font-size:11px;font-weight:750}
+.save-confirm:hover{background:#9368d3}
+
+@media(max-width:1100px){
+  .brand{min-width:auto}
+  .project-area{display:none}
+  .topbar{padding:0 12px}
+  .actions{gap:5px}
+  .btn{padding:8px 9px}
+  .main{grid-template-columns:55px minmax(0,1fr) 245px}
+}
+@media(max-width:650px){
+  body{height:auto;min-height:100vh;overflow:auto}
+  .app{height:auto;min-height:calc(100vh - 66px);overflow:visible}
+  .main{grid-template-columns:48px minmax(0,1fr);grid-template-rows:auto;overflow:visible}
+  .inspector{grid-column:1/-1;height:390px;max-height:390px;min-height:0;overflow-y:auto;overflow-x:hidden}
+  .stage{min-height:440px;padding:15px}
+  .filmstrip{height:115px}
+  .topbar{padding:0 8px}
+  .brand-sub{display:none}
+  .brand-name{font-size:12px}
+  .actions .btn{font-size:9px;padding:8px 6px}
+  .canvas-header{padding:0 9px}
+  .file-title{max-width:130px}
+  .canvas-stat{display:none}
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">A</div>
+    <div>
+      <div class="brand-name">AnnotateX Studio</div>
+      <div class="brand-sub">Image Annotation Workspace</div>
+    </div>
+  </div>
+
+  <div class="project-area">
+    <span>PROJECT</span>
+    <input class="project-name" id="projectName" value="Untitled Annotation Project">
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="undoBtn" disabled>↶ Undo</button>
+    <button class="btn" id="redoBtn" disabled>↷ Redo</button>
+    <button class="btn" id="importBtn">↑ Import Project</button>
+    <button class="btn" id="uploadBtn">＋ Upload</button>
+    <button class="btn primary" id="exportBtn">↓ Save Annotations</button>
+  </div>
+</header>
+
+<div class="app">
+  <main class="main">
+
+    <aside class="toolbar">
+      <div class="tool-caption">Tools</div>
+      <button class="tool active" data-tool="draw" title="Draw Bounding Box">▧</button>
+      <button class="tool" data-tool="select" title="Select and Move">↖</button>
+      <div class="tool-separator"></div>
+      <div class="tool-caption">Zoom</div>
+      <button class="tool" id="zoomOut" title="Zoom Out">−</button>
+      <button class="tool" id="zoomIn" title="Zoom In">＋</button>
+      <button class="tool" id="fitBtn" title="Fit to Screen">⛶</button>
+      <div class="tool-separator"></div>
+      <div class="tool-caption">Edit</div>
+      <button class="tool" id="deleteBtn" title="Delete Selected" disabled>⌫</button>
+    </aside>
+
+    <section class="canvas-area">
+      <div class="canvas-header">
+        <div class="file-info">
+          <span class="file-indicator"></span>
+          <span class="file-title" id="activeFileName">No image selected</span>
+          <span class="dimensions" id="dimensions">—</span>
+        </div>
+        <div class="canvas-controls">
+          <span class="canvas-stat" id="boxCountTop">0 annotations</span>
+          <div class="zoom-controls">
+            <button id="zoomMinus">−</button>
+            <span id="zoomLabel">100%</span>
+            <button id="zoomPlus">＋</button>
+          </div>
+          <button class="fit-button" id="fitTop">Fit Screen</button>
+        </div>
+      </div>
+
+      <div class="stage" id="stage">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">▧</div>
+          <h2>Your workspace is ready</h2>
+          <p>Upload your images and start creating accurate bounding-box annotations. Your image library will appear below.</p>
+          <button class="empty-upload" id="emptyUpload">＋ Upload Images</button>
+        </div>
+
+        <div class="canvas-wrap" id="canvasWrap" hidden>
+          <div class="measurement" id="measurement" hidden></div>
+          <canvas id="canvas"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <aside class="inspector">
+      <div class="inspector-heading">
+        <div class="inspector-heading-row">
+          <strong>ANNOTATION INSPECTOR</strong>
+          <span class="count">LIVE</span>
+        </div>
+        <p>Manage objects and annotation properties</p>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Objects on image <span class="count" id="objectCount">0</span></div>
+        <div class="object-list" id="objectList">
+          <div class="empty-list">No annotations yet.<br>Draw a box on the image.</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Class label</div>
+        <label class="field-label">Choose a label</label>
+        <select id="classSelect">
+          <option>Object</option>
+          <option>Person</option>
+          <option>Vehicle</option>
+          <option>Animal</option>
+          <option>Plant</option>
+          <option>Other</option>
+        </select>
+        <label class="field-label">Add custom label</label>
+        <div class="label-row">
+          <input type="text" id="newClass" placeholder="e.g. Car, Cat, Tree">
+          <button id="addClassBtn">Add</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Box coordinates <span class="count" id="selectedBadge">None</span></div>
+        <div class="coord-grid">
+          <div><label class="field-label">X position</label><input type="number" id="coordX" disabled></div>
+          <div><label class="field-label">Y position</label><input type="number" id="coordY" disabled></div>
+          <div><label class="field-label">Width</label><input type="number" id="coordW" disabled></div>
+          <div><label class="field-label">Height</label><input type="number" id="coordH" disabled></div>
+        </div>
+        <div class="hint">Values use original image pixels. Select a box to edit its coordinates.</div>
+      </div>
+
+      <div class="section">
+        <button class="delete-button" id="deleteSelected" disabled>⌫ Delete selected annotation</button>
+      </div>
+    </aside>
+  </main>
+
+  <section class="filmstrip">
+    <div class="filmstrip-header">
+      <strong>IMAGE LIBRARY · FILMSTRIP</strong>
+      <span id="imageCount">0 images uploaded</span>
+    </div>
+    <div class="thumbnails" id="thumbnails">
+      <button class="add-thumb" id="addMore">＋<span>Add images</span></button>
+    </div>
+  </section>
+
+  <footer class="statusbar">
+    <div class="status-left">
+      <span class="status-dot"></span>
+      <span id="statusText">Ready · Upload images to begin</span>
+    </div>
+    <span id="totalBoxes">0 total boxes</span>
+  </footer>
+</div>
+
+<div class="save-overlay" id="saveOverlay" hidden>
+  <div class="save-dialog">
+    <h2>Save Annotations</h2>
+    <p>Enter a name for your annotation file. Leave it empty to use the default name.</p>
+    <label for="saveFileName">File name</label>
+    <input type="text" id="saveFileName" placeholder="Default: My_Annotations" autocomplete="off">
+    <div class="save-dialog-actions">
+      <button type="button" class="save-cancel" id="cancelSave">Cancel</button>
+      <button type="button" class="save-confirm" id="confirmSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW: IMPORT IMAGE SELECTION POPUP -->
+<div class="save-overlay" id="relinkOverlay" hidden>
+  <div class="save-dialog">
+    <h2>Restore Original Images</h2>
+    <p>Your project file has been read successfully. Now select the original images that you used for annotation.</p>
+    <div class="save-dialog-actions">
+      <button type="button" class="save-cancel" id="cancelRelink">Cancel</button>
+      <button type="button" class="save-confirm" id="selectRelink">Select Original Images</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept="image/*" multiple>
+<input type="file" id="jsonInput" accept=".json,application/json">
+<input type="file" id="relinkInput" accept="image/*" multiple>
+
+<script>
+const $ = id => document.getElementById(id);
+const canvas = $("canvas");
+const ctx = canvas.getContext("2d");
+
+let images = [];
+let activeIndex = -1;
+let selectedId = null;
+let tool = "draw";
+let zoom = 1;
+let undoStack = [];
+let redoStack = [];
+let drag = null;
+let nextId = 1;
+
+/* Holds JSON data temporarily while the user selects original images */
+let pendingImportData = null;
+
+const colors = ["#b18ae9","#5dc5a3","#e3a56d","#d67fae","#85b5db","#d5c477"];
+
+function current(){return images[activeIndex]||null}
+function totalBoxes(){return images.reduce((sum,img)=>sum+img.boxes.length,0)}
+function selectedBox(){return current()?.boxes.find(b=>b.id===selectedId)||null}
+
+/* HISTORY */
+function snapshot(){return images.map(im=>im.boxes.map(b=>({...b})))}
+function saveHistory(){
+  undoStack.push(JSON.stringify(snapshot()));
+  if(undoStack.length>80)undoStack.shift();
+  redoStack=[];
+  updateHistoryButtons();
+}
+function restoreHistory(data){
+  const parsed=JSON.parse(data);
+  parsed.forEach((boxes,i)=>{if(images[i])images[i].boxes=boxes});
+  selectedId=null;
+  renderAll();
+}
+function undo(){
+  if(!undoStack.length)return;
+  redoStack.push(JSON.stringify(snapshot()));
+  restoreHistory(undoStack.pop());
+  $("statusText").textContent="Last action undone";
+  updateHistoryButtons();
+}
+function redo(){
+  if(!redoStack.length)return;
+  undoStack.push(JSON.stringify(snapshot()));
+  restoreHistory(redoStack.pop());
+  $("statusText").textContent="Action restored";
+  updateHistoryButtons();
+}
+function updateHistoryButtons(){
+  $("undoBtn").disabled=!undoStack.length;
+  $("redoBtn").disabled=!redoStack.length;
+}
+
+/* NORMAL IMAGE UPLOAD */
+function openFiles(fileList){
+  const files=[...fileList].filter(f=>f.type.startsWith("image/"));
+
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        images.push({
+          id:Date.now()+Math.random(),
+          name:file.name,
+          url:e.target.result,
+          img,
+          boxes:[]
+        });
+        if(activeIndex===-1)activeIndex=0;
+        renderAll();
+        if(activeIndex===images.length-1)fitImage();
+        $("statusText").textContent="Image added: "+file.name;
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function selectImage(index){
+  if(index<0||index>=images.length)return;
+  activeIndex=index;
+  selectedId=null;
+  drag=null;
+  renderAll();
+  fitImage();
+}
+
+/* IMPORT PROJECT: STEP 1 - SELECT JSON */
+function startImport(){
+  $("jsonInput").click();
+}
+
+/* IMPORT PROJECT: READ AND CHECK JSON */
+$("jsonInput").addEventListener("change",event=>{
+  const file=event.target.files[0];
+  event.target.value="";
+  if(!file)return;
+
+  const reader=new FileReader();
+
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result);
+
+      if(!data||!Array.isArray(data.images)){
+        throw new Error("This JSON does not contain a valid images list.");
+      }
+
+      if(data.images.length===0){
+        throw new Error("No images were found inside this project file.");
+      }
+
+      const valid=data.images.every(item=>
+        typeof item.file_name==="string" &&
+        Number.isFinite(Number(item.width)) &&
+        Number.isFinite(Number(item.height)) &&
+        Array.isArray(item.annotations)
+      );
+
+      if(!valid){
+        throw new Error("The JSON format is not compatible with AnnotateX Studio.");
+      }
+
+      pendingImportData=data;
+
+      /* Show popup instead of automatically opening another file picker */
+      $("relinkOverlay").hidden=false;
+
+    }catch(error){
+      alert("Import failed: "+error.message);
+      pendingImportData=null;
+    }
+  };
+
+  reader.onerror=()=>alert("Could not read the JSON file.");
+  reader.readAsText(file);
+});
+
+/* IMPORT PROJECT: STEP 2 - MATCH ORIGINAL IMAGES AND RESTORE BOXES */
+$("relinkInput").addEventListener("change",async event=>{
+  const files=[...event.target.files].filter(f=>f.type.startsWith("image/"));
+  event.target.value="";
+
+  if(!pendingImportData)return;
+
+  if(!files.length){
+    $("statusText").textContent="Image selection cancelled";
+    pendingImportData=null;
+    return;
+  }
+
+  const savedImages=pendingImportData.images;
+  const usedFiles=new Set();
+  const restored=[];
+  const unmatched=[];
+
+  try{
+    for(const saved of savedImages){
+      let fileIndex=files.findIndex((file,index)=>
+        !usedFiles.has(index)&&file.name===saved.file_name
+      );
+
+      /* If filename does not match, try matching by image dimensions */
+      if(fileIndex===-1){
+        for(let i=0;i<files.length;i++){
+          if(usedFiles.has(i))continue;
+
+          const dimensions=await getImageDimensions(files[i]);
+
+          if(
+            dimensions.width===Number(saved.width)&&
+            dimensions.height===Number(saved.height)
+          ){
+            fileIndex=i;
+            break;
+          }
+        }
+      }
+
+      if(fileIndex===-1){
+        unmatched.push(saved.file_name);
+        continue;
+      }
+
+      usedFiles.add(fileIndex);
+      const file=files[fileIndex];
+      const loaded=await loadImageFile(file);
+
+      const boxes=saved.annotations
+        .map(annotation=>{
+          const x=Number(annotation.x);
+          const y=Number(annotation.y);
+          const w=Number(annotation.width);
+          const h=Number(annotation.height);
+
+          if(
+            !Number.isFinite(x)||!Number.isFinite(y)||
+            !Number.isFinite(w)||!Number.isFinite(h)||
+            w<=0||h<=0
+          )return null;
+
+          const safeX=Math.max(0,Math.min(x,loaded.img.naturalWidth-1));
+          const safeY=Math.max(0,Math.min(y,loaded.img.naturalHeight-1));
+          const safeW=Math.max(1,Math.min(w,loaded.img.naturalWidth-safeX));
+          const safeH=Math.max(1,Math.min(h,loaded.img.naturalHeight-safeY));
+
+          const id=Number(annotation.id);
+
+          return {
+            id:Number.isFinite(id)?id:nextId++,
+            label:String(annotation.label||"Object"),
+            x:safeX,
+            y:safeY,
+            w:safeW,
+            h:safeH
+          };
+        })
+        .filter(Boolean);
+
+      restored.push({
+        id:Date.now()+Math.random(),
+        name:file.name,
+        url:loaded.url,
+        img:loaded.img,
+        boxes
+      });
+    }
+
+    if(!restored.length){
+      alert("No matching original images were found. Please select the correct images.");
+      pendingImportData=null;
+      return;
+    }
+
+    /* Replace the current workspace with imported project */
+    images=restored;
+    activeIndex=0;
+    selectedId=null;
+    drag=null;
+    zoom=1;
+
+    const allIds=images.flatMap(im=>im.boxes.map(box=>Number(box.id)));
+    nextId=Math.max(0,...allIds.filter(Number.isFinite))+1;
+
+    $("projectName").value=pendingImportData.project||"Imported Project";
+
+    undoStack=[];
+    redoStack=[];
+    updateHistoryButtons();
+
+    renderAll();
+    fitImage();
+
+    let status="Project imported successfully: "+restored.length+" image(s) restored.";
+
+    if(unmatched.length){
+      status+=" Missing: "+unmatched.join(", ");
+      alert(
+        "Project partially imported.\n\nRestored images: "+restored.length+
+        "\nImages not matched: "+unmatched.join(", ")+
+        "\n\nPlease check that you selected all the original images."
+      );
+    }else{
+      alert("Project imported successfully!\nYour images and bounding boxes have been restored.");
+    }
+
+    $("statusText").textContent=status;
+    pendingImportData=null;
+
+  }catch(error){
+    alert("There was a problem importing this project: "+error.message);
+    pendingImportData=null;
+  }
+});
+
+/* LOAD AN IMAGE FILE AS A PROMISE */
+function loadImageFile(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+
+    reader.onload=e=>{
+      const img=new Image();
+
+      img.onload=()=>resolve({
+        img,
+        url:e.target.result
+      });
+
+      img.onerror=()=>reject(new Error("Could not load image: "+file.name));
+      img.src=e.target.result;
+    };
+
+    reader.onerror=()=>reject(new Error("Could not read image: "+file.name));
+    reader.readAsDataURL(file);
+  });
+}
+
+/* GET IMAGE DIMENSIONS */
+function getImageDimensions(file){
+  return loadImageFile(file).then(result=>({
+    width:result.img.naturalWidth,
+    height:result.img.naturalHeight
+  }));
+}
+
+/* THUMBNAILS */
+function renderThumbnails(){
+  const holder=$("thumbnails");
+  holder.innerHTML="";
+
+  images.forEach((im,index)=>{
+    const button=document.createElement("button");
+    button.className="thumb"+(index===activeIndex?" active":"");
+
+    const image=document.createElement("img");
+    image.src=im.url;
+    image.alt=im.name;
+
+    const name=document.createElement("span");
+    name.className="thumb-name";
+    name.textContent=im.name;
+
+    button.append(image,name);
+    button.title=im.name;
+    button.onclick=()=>selectImage(index);
+    holder.appendChild(button);
+  });
+
+  const add=document.createElement("button");
+  add.className="add-thumb";
+  add.innerHTML='＋<span>Add images</span>';
+  add.onclick=()=>$("fileInput").click();
+  holder.appendChild(add);
+
+  $("imageCount").textContent=images.length+" image"+(images.length===1?"":"s")+" uploaded";
+}
+
+/* DRAW BOXES AND IMAGE */
+function render(){
+  const im=current();
+
+  if(!im){
+    $("emptyState").hidden=false;
+    $("canvasWrap").hidden=true;
+    $("activeFileName").textContent="No image selected";
+    $("dimensions").textContent="—";
+    $("measurement").hidden=true;
+    return;
+  }
+
+  $("emptyState").hidden=true;
+  $("canvasWrap").hidden=false;
+
+  canvas.width=im.img.naturalWidth;
+  canvas.height=im.img.naturalHeight;
+  canvas.style.width=(canvas.width*zoom)+"px";
+  canvas.style.height=(canvas.height*zoom)+"px";
+
+  $("activeFileName").textContent=im.name;
+  $("dimensions").textContent=canvas.width+" × "+canvas.height+" px";
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(im.img,0,0);
+
+  im.boxes.forEach((box,index)=>{
+    const selected=box.id===selectedId;
+    const color=colors[index%colors.length];
+
+    ctx.lineWidth=Math.max(2,canvas.width/850);
+    ctx.strokeStyle=selected?"#c7a2fa":color;
+    ctx.fillStyle=selected?"#b18ae91a":color+"20";
+
+    ctx.fillRect(box.x,box.y,box.w,box.h);
+    ctx.strokeRect(box.x,box.y,box.w,box.h);
+
+    const fontSize=Math.max(12,canvas.width/90);
+    ctx.font=`600 ${fontSize}px Arial`;
+
+    const label=box.label;
+    const labelWidth=ctx.measureText(label).width;
+    const labelHeight=Math.max(22,canvas.width/45);
+    const labelY=Math.max(0,box.y-labelHeight);
+
+    ctx.fillStyle=selected?"#8157b7":color;
+    ctx.fillRect(box.x,labelY,labelWidth+16,labelHeight);
+
+    ctx.fillStyle="#fff";
+    ctx.fillText(label,box.x+8,labelY+labelHeight*.69);
+
+    if(selected){
+      const size=Math.max(7,canvas.width/140);
+      getCorners(box).forEach(([x,y])=>{
+        ctx.fillStyle="#fff";
+        ctx.fillRect(x-size/2,y-size/2,size,size);
+        ctx.lineWidth=Math.max(1,canvas.width/1000);
+        ctx.strokeStyle="#8c5fc3";
+        ctx.strokeRect(x-size/2,y-size/2,size,size);
+      });
+    }
+  });
+
+  $("zoomLabel").textContent=Math.round(zoom*100)+"%";
+  $("boxCountTop").textContent=im.boxes.length+" annotations";
+  canvas.style.cursor=tool==="draw"?"crosshair":drag?"grabbing":"default";
+
+  if(drag&&drag.type==="draw"){
+    $("measurement").hidden=false;
+    $("measurement").textContent="W: "+Math.round(drag.box.w)+" px  ×  H: "+Math.round(drag.box.h)+" px";
+  }else{
+    $("measurement").hidden=true;
+  }
+}
+
+/* RESIZE HANDLE POSITIONS */
+function getCorners(box){
+  return [[box.x,box.y],[box.x+box.w,box.y],[box.x,box.y+box.h],[box.x+box.w,box.y+box.h]];
+}
+function getHandle(point,box){
+  const corners=getCorners(box);
+  const radius=12/zoom;
+
+  for(let i=0;i<corners.length;i++){
+    const [x,y]=corners[i];
+    if(Math.hypot(point.x-x,point.y-y)<=radius){
+      return ["nw","ne","sw","se"][i];
+    }
+  }
+  return null;
+}
+
+/* INSPECTOR */
+function updateInspector(){
+  const im=current();
+  const list=$("objectList");
+  list.innerHTML="";
+
+  if(!im||!im.boxes.length){
+    list.innerHTML='<div class="empty-list">No annotations yet.<br>Draw a box on the image.</div>';
+  }else{
+    im.boxes.forEach((box,index)=>{
+      const row=document.createElement("div");
+      row.className="object-item"+(box.id===selectedId?" selected":"");
+
+      const dot=document.createElement("span");
+      dot.className="object-dot";
+      dot.style.background=colors[index%colors.length];
+
+      const name=document.createElement("span");
+      name.className="object-name";
+      name.textContent=box.label;
+
+      const size=document.createElement("span");
+      size.className="object-size";
+      size.textContent=Math.round(box.w)+"×"+Math.round(box.h);
+
+      row.append(dot,name,size);
+      row.onclick=()=>{
+        selectedId=box.id;
+        render();
+        updateInspector();
+      };
+      list.appendChild(row);
+    });
+  }
+
+  $("objectCount").textContent=im?im.boxes.length:0;
+  const box=selectedBox();
+
+  ["coordX","coordY","coordW","coordH"].forEach(id=>$(id).disabled=!box);
+
+  $("selectedBadge").textContent=box?"Selected":"None";
+  $("deleteSelected").disabled=!box;
+  $("deleteBtn").disabled=!box;
+
+  if(box){
+    $("coordX").value=Math.round(box.x);
+    $("coordY").value=Math.round(box.y);
+    $("coordW").value=Math.round(box.w);
+    $("coordH").value=Math.round(box.h);
+
+    /* Add a custom imported label to the dropdown if needed */
+    const select=$("classSelect");
+    if(![...select.options].some(option=>option.value===box.label)){
+      const option=document.createElement("option");
+      option.value=box.label;
+      option.textContent=box.label;
+      select.appendChild(option);
+    }
+    select.value=box.label;
+  }else{
+    ["coordX","coordY","coordW","coordH"].forEach(id=>$(id).value="");
+  }
+}
+
+function updateCounts(){
+  $("totalBoxes").textContent=totalBoxes()+" total boxes";
+}
+function renderAll(){
+  renderThumbnails();
+  render();
+  updateInspector();
+  updateCounts();
+}
+
+/* CANVAS COORDINATES */
+function getPoint(event){
+  const rect=canvas.getBoundingClientRect();
+  return {
+    x:(event.clientX-rect.left)*(canvas.width/rect.width),
+    y:(event.clientY-rect.top)*(canvas.height/rect.height)
+  };
+}
+function hitBox(point){
+  const im=current();
+  if(!im)return null;
+
+  for(let i=im.boxes.length-1;i>=0;i--){
+    const b=im.boxes[i];
+    if(point.x>=b.x&&point.x<=b.x+b.w&&point.y>=b.y&&point.y<=b.y+b.h)return b;
+  }
+  return null;
+}
+
+/* TOOL SELECTION */
+function setTool(name){
+  tool=name;
+  document.querySelectorAll("[data-tool]").forEach(button=>{
+    button.classList.toggle("active",button.dataset.tool===name);
+  });
+  render();
+}
+
+/* POINTER DOWN */
+canvas.addEventListener("pointerdown",event=>{
+  const im=current();
+  if(!im)return;
+
+  const point=getPoint(event);
+
+  if(tool==="draw"){
+    saveHistory();
+
+    const box={
+      id:nextId++,
+      x:point.x,y:point.y,w:0,h:0,
+      label:$("classSelect").value
+    };
+
+    im.boxes.push(box);
+    selectedId=box.id;
+    drag={type:"draw",start:point,box};
+    canvas.setPointerCapture(event.pointerId);
+  }else{
+    const existing=selectedBox();
+    const handle=existing?getHandle(point,existing):null;
+
+    if(existing&&handle){
+      saveHistory();
+      drag={type:"resize",handle,box:existing,original:{x:existing.x,y:existing.y,w:existing.w,h:existing.h}};
+      canvas.setPointerCapture(event.pointerId);
+    }else{
+      const box=hitBox(point);
+
+      if(box){
+        selectedId=box.id;
+        saveHistory();
+        drag={type:"move",start:point,box,original:{x:box.x,y:box.y}};
+        canvas.setPointerCapture(event.pointerId);
+      }else{
+        selectedId=null;
+      }
+    }
+  }
+
+  render();
+  updateInspector();
+});
+
+/* POINTER MOVE */
+canvas.addEventListener("pointermove",event=>{
+  if(!drag){
+    const point=getPoint(event);
+    const box=selectedBox();
+
+    if(tool==="select"&&box&&getHandle(point,box)){
+      canvas.style.cursor="nwse-resize";
+    }else if(tool==="select"&&hitBox(point)){
+      canvas.style.cursor="move";
+    }else{
+      canvas.style.cursor=tool==="draw"?"crosshair":"default";
+    }
+    return;
+  }
+
+  const point=getPoint(event);
+  const box=drag.box;
+
+  if(drag.type==="draw"){
+    const left=Math.min(point.x,drag.start.x);
+    const top=Math.min(point.y,drag.start.y);
+    box.x=Math.max(0,left);
+    box.y=Math.max(0,top);
+    box.w=Math.min(canvas.width-box.x,Math.abs(point.x-drag.start.x));
+    box.h=Math.min(canvas.height-box.y,Math.abs(point.y-drag.start.y));
+  }
+
+  if(drag.type==="move"){
+    box.x=Math.max(0,Math.min(canvas.width-box.w,drag.original.x+point.x-drag.start.x));
+    box.y=Math.max(0,Math.min(canvas.height-box.h,drag.original.y+point.y-drag.start.y));
+  }
+
+  if(drag.type==="resize"){
+    const o=drag.original;
+    let left=o.x,top=o.y,right=o.x+o.w,bottom=o.y+o.h;
+
+    if(drag.handle.includes("w"))left=Math.min(point.x,right-1);
+    if(drag.handle.includes("e"))right=Math.max(point.x,left+1);
+    if(drag.handle.includes("n"))top=Math.min(point.y,bottom-1);
+    if(drag.handle.includes("s"))bottom=Math.max(point.y,top+1);
+
+    left=Math.max(0,left);
+    top=Math.max(0,top);
+    right=Math.min(canvas.width,right);
+    bottom=Math.min(canvas.height,bottom);
+
+    box.x=left;box.y=top;
+    box.w=Math.max(1,right-left);
+    box.h=Math.max(1,bottom-top);
+  }
+
+  render();
+  updateInspector();
+});
+
+/* POINTER UP */
+function finishDrag(){
+  if(!drag)return;
+
+  if(drag.type==="draw"){
+    const box=drag.box;
+    if(box.w<4||box.h<4){
+      const im=current();
+      im.boxes=im.boxes.filter(b=>b.id!==box.id);
+      selectedId=null;
+    }
+  }
+
+  drag=null;
+  render();
+  updateInspector();
+  updateCounts();
+}
+canvas.addEventListener("pointerup",finishDrag);
+canvas.addEventListener("pointercancel",finishDrag);
+
+/* DELETE */
+function deleteSelected(){
+  const im=current();
+
+  if(!im||selectedId===null){
+    $("statusText").textContent="Please select an annotation first";
+    return;
+  }
+
+  const boxExists=im.boxes.some(box=>box.id===selectedId);
+  if(!boxExists){
+    selectedId=null;
+    renderAll();
+    return;
+  }
+
+  saveHistory();
+  im.boxes=im.boxes.filter(box=>box.id!==selectedId);
+  selectedId=null;
+  renderAll();
+  $("statusText").textContent="Annotation deleted successfully";
+}
+
+/* ZOOM */
+function zoomBy(factor){
+  zoom=Math.max(.1,Math.min(4,zoom*factor));
+  render();
+}
+function fitImage(){
+  const im=current();
+  if(!im)return;
+
+  const stage=$("stage");
+  const padding=70;
+
+  zoom=Math.min(
+    (stage.clientWidth-padding)/im.img.naturalWidth,
+    (stage.clientHeight-padding)/im.img.naturalHeight,
+    1
+  );
+
+  if(!Number.isFinite(zoom)||zoom<=0)zoom=.5;
+  render();
+}
+
+/* EXPORT JSON */
+function exportJSON(){
+  if(!images.length){
+    alert("Please upload an image first.");
+    return;
+  }
+
+  $("saveFileName").value="";
+  $("saveOverlay").hidden=false;
+  $("saveFileName").focus();
+}
+
+function saveAnnotationFile(){
+  if(!images.length){
+    $("saveOverlay").hidden=true;
+    return;
+  }
+
+  let fileName=$("saveFileName").value.trim();
+  if(!fileName)fileName="My_Annotations";
+
+  fileName=fileName.replace(/[\\/:*?"<>|]/g,"_");
+
+  if(!fileName.toLowerCase().endsWith(".json")){
+    fileName+=".json";
+  }
+
+  const data={
+    project:$("projectName").value,
+    created:new Date().toISOString(),
+    annotation_format:"xywh_pixels",
+    images:images.map(im=>({
+      file_name:im.name,
+      width:im.img.naturalWidth,
+      height:im.img.naturalHeight,
+      annotations:im.boxes.map(box=>({
+        id:box.id,
+        label:box.label,
+        x:Math.round(box.x),
+        y:Math.round(box.y),
+        width:Math.round(box.w),
+        height:Math.round(box.h)
+      }))
+    }))
+  };
+
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement("a");
+
+  link.href=url;
+  link.download=fileName;
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+
+  $("saveOverlay").hidden=true;
+  $("statusText").textContent="Saved successfully: "+fileName;
+}
+
+/* CUSTOM LABEL */
+function addCustomLabel(){
+  const value=$("newClass").value.trim();
+  if(!value)return;
+
+  const select=$("classSelect");
+  const exists=[...select.options].some(o=>o.value===value);
+
+  if(!exists){
+    const option=document.createElement("option");
+    option.value=value;
+    option.textContent=value;
+    select.appendChild(option);
+  }
+
+  select.value=value;
+  $("newClass").value="";
+
+  const box=selectedBox();
+  if(box){
+    saveHistory();
+    box.label=value;
+    renderAll();
+  }
+}
+
+/* EDIT COORDINATES */
+[["coordX","x"],["coordY","y"],["coordW","w"],["coordH","h"]].forEach(([id,key])=>{
+  $(id).addEventListener("change",()=>{
+    const box=selectedBox();
+    const im=current();
+    if(!box||!im)return;
+
+    const value=Number($(id).value);
+    if(!Number.isFinite(value))return;
+
+    saveHistory();
+
+    if(key==="x")box.x=Math.max(0,Math.min(value,canvas.width-1));
+    if(key==="y")box.y=Math.max(0,Math.min(value,canvas.height-1));
+    if(key==="w")box.w=Math.max(1,Math.min(value,canvas.width-box.x));
+    if(key==="h")box.h=Math.max(1,Math.min(value,canvas.height-box.y));
+
+    renderAll();
+  });
+});
+
+/* BUTTON EVENTS */
+$("uploadBtn").onclick=$("emptyUpload").onclick=$("addMore").onclick=()=>$("fileInput").click();
+
+$("fileInput").addEventListener("change",event=>{
+  openFiles(event.target.files);
+  event.target.value="";
+});
+
+$("importBtn").onclick=startImport;
+
+/* NEW: OPEN ORIGINAL IMAGE PICKER FROM USER CLICK */
+$("selectRelink").onclick=()=>{
+  if(!pendingImportData)return;
+  $("relinkOverlay").hidden=true;
+  $("relinkInput").click();
+};
+
+/* NEW: CANCEL IMPORT */
+$("cancelRelink").onclick=()=>{
+  $("relinkOverlay").hidden=true;
+  pendingImportData=null;
+  $("statusText").textContent="Project import cancelled";
+};
+
+$("undoBtn").onclick=undo;
+$("redoBtn").onclick=redo;
+$("deleteBtn").onclick=$("deleteSelected").onclick=deleteSelected;
+$("exportBtn").onclick=exportJSON;
+
+$("confirmSave").onclick=saveAnnotationFile;
+$("cancelSave").onclick=()=>{
+  $("saveOverlay").hidden=true;
+  $("statusText").textContent="Save cancelled";
+};
+
+$("saveOverlay").addEventListener("click",event=>{
+  if(event.target===$("saveOverlay"))$("saveOverlay").hidden=true;
+});
+
+$("saveFileName").addEventListener("keydown",event=>{
+  if(event.key==="Enter"){
+    event.preventDefault();
+    saveAnnotationFile();
+  }
+  if(event.key==="Escape")$("saveOverlay").hidden=true;
+});
+
+document.querySelectorAll("[data-tool]").forEach(button=>{
+  button.onclick=()=>setTool(button.dataset.tool);
+});
+
+$("zoomIn").onclick=$("zoomPlus").onclick=()=>zoomBy(1.2);
+$("zoomOut").onclick=$("zoomMinus").onclick=()=>zoomBy(1/1.2);
+$("fitBtn").onclick=$("fitTop").onclick=fitImage;
+$("addClassBtn").onclick=addCustomLabel;
+
+$("classSelect").onchange=()=>{
+  const box=selectedBox();
+  if(box){
+    saveHistory();
+    box.label=$("classSelect").value;
+    renderAll();
+  }
+};
+
+$("projectName").addEventListener("input",()=>{
+  $("statusText").textContent="Project name updated";
+});
+
+/* KEYBOARD SHORTCUTS */
+window.addEventListener("keydown",event=>{
+  const tag=document.activeElement?.tagName;
+  const editing=["INPUT","SELECT","TEXTAREA"].includes(tag);
+
+  if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="z"){
+    if(editing)return;
+    event.preventDefault();
+    if(event.shiftKey)redo();else undo();
+  }
+
+  if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="y"){
+    if(editing)return;
+    event.preventDefault();
+    redo();
+  }
+
+  if(event.key==="Delete"&&!editing)deleteSelected();
+
+  if(event.key==="Escape"){
+    drag=null;
+    render();
+  }
+});
+
+window.addEventListener("resize",()=>{
+  if(current())fitImage();
+});
+
+updateHistoryButtons();
+renderAll();
+</script>
+</body>
+</html>
